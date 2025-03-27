@@ -811,6 +811,9 @@ class PytorchMiniRocketMultivariate(torch.nn.Module):
 
 
 class DetachEnsemble():
+    """
+    verbose: 0 = no output, 1 = print progress, 2 = print progress and detailed output from DetachRocket
+    """
     def __init__(self, 
                 num_models=25, 
                 num_kernels=10000, 
@@ -818,7 +821,7 @@ class DetachEnsemble():
                 trade_off=0.1, 
                 recompute_alpha=True,
                 val_ratio=0.33, 
-                verbose=False,
+                verbose=1,
                 multilabel_type='max',
                 fixed_percentage=None,
                 ):
@@ -835,7 +838,7 @@ class DetachEnsemble():
                             trade_off=trade_off,
                             recompute_alpha=recompute_alpha,
                             val_ratio=val_ratio,
-                            verbose=verbose,
+                            verbose=True if verbose == 2 else False,
                             multilabel_type=multilabel_type,
                             fixed_percentage=fixed_percentage,
                            )
@@ -848,9 +851,11 @@ class DetachEnsemble():
     # Transformer / Classifier methods
     def fit(self, X, y):
         for i, model in enumerate(self.derockets):
-            print(f'Fitting model {i+1:03d} of {self.num_models:03d}')
+            if self.verbose == 1:
+                print(f'Fitting model {i+1:3d} of {self.num_models:3d}')
             model.fit(X, y)
-            print(f'              {i+1:03d} is {100*model._max_percentage:7.3f}% of the original model size.')
+            if self.verbose == 1:
+                print(f'              {i+1:3d} is {100*model._max_percentage:7.3f}% of the original model size.')
         self.num_channels = X.shape[1]
         self.label_encoder.fit(y)
 
