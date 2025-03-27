@@ -56,6 +56,7 @@ def feature_detachment(classifier,
     nomalized_condition = np.isclose(mean_vector, zeros_vector,atol=1e-02)
     # assert all(nomalized_condition), "The feature matrix should be normalized before training classifier."
     total_feats = X_train.shape[1]
+    print(f'total_feats: {total_feats}')
 
     # Feature importance from full model
     

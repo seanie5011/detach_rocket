@@ -918,16 +918,7 @@ class DetachEnsemble():
         Returns the size of each model in the ensemble, in terms of number of kernels.
         """
         model = self.derockets[0]
-        feature_weights = model._feature_importance_matrix[model._max_index] # Sparse float array (num_features,)
-        selection_mask = feature_weights > 0
-        channel_combinations_derocket = model._full_transformer.get_kernel_features('channels', selection_mask) # Indicator matrix (num_features, num_channels)
-        num_channels_in_kernel = np.nansum(channel_combinations_derocket, axis=1)
         print(f'model._max_percentage: {model._max_percentage}')
-        print(f'1 / model._max_percentage: {1 / model._max_percentage}')
-        print(f'126 * model._max_percentage: {126 * model._max_percentage}')
         print(f'model.num_kernels: {model.num_kernels}')
-        print(f'model.num_kernels * model._max_percentage: {model.num_kernels * model._max_percentage}')
-        print(f'num_channels_in_kernel: {num_channels_in_kernel}')
-        print(f'num_channels_in_kernel.sum(): {num_channels_in_kernel.sum()}')
-        print(f'num_channels_in_kernel.sum() / model.num_kernels: {num_channels_in_kernel.sum() / model.num_kernels}')
+        print(f'model._feature_importance_matrix.shape: {model._feature_importance_matrix.shape}')
         return [model._max_percentage * model.num_kernels for model in self.derockets]
