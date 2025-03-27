@@ -15,7 +15,7 @@ def feature_detachment(classifier,
                         drop_percentage: float = 0.05,
                         total_number_steps: int = 150,
                         multilabel_type: str = "norm",
-                        verbose = True):
+                        verbose = False):
     """
     Applies Sequential Feature Detachment (SFD) to a feature matrix.
 
@@ -150,7 +150,7 @@ def select_optimal_model(percentage_vector,
                             full_model_score_test,
                             acc_size_tradeoff_coef: float=0.1, # 0 means only weighting accuracy, +inf only weighting model size
                             smoothing_points: int = 3,
-                            graphics = True):
+                            graphics = False):
 
     """
     Function that selects the optimal model size after SFD procces.
@@ -214,7 +214,7 @@ def retrain_optimal_model(feature_mask,
                           y_train,
                           max_index,
                           model_alpha = None,
-                          verbose = True):
+                          verbose = False):
 
     """
     Function that retrains a Ridge classifier with the optimal subset of selected features.
@@ -258,9 +258,10 @@ def retrain_optimal_model(feature_mask,
     optimal_classifier.fit(masked_X_train, y_train)
     optimal_acc_train = optimal_classifier.score(masked_X_train, y_train)
 
-    print('TRAINING RESULTS Detach Model:')
-    print('Optimal Alpha Detach Model: {:.2f}'.format(model_alpha))
-    print('Train Accuraccy Detach Model: {:.2f}%'.format(100*optimal_acc_train))
-    print('-------------------------')
+    if verbose == True:
+      print('TRAINING RESULTS Detach Model:')
+      print('Optimal Alpha Detach Model: {:.2f}'.format(model_alpha))
+      print('Train Accuraccy Detach Model: {:.2f}%'.format(100*optimal_acc_train))
+      print('-------------------------')
 
     return optimal_classifier, optimal_acc_train
