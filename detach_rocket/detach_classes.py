@@ -146,10 +146,11 @@ class DetachRocket:
         self._full_classifier.fit(self._feature_matrix, y)
         self._full_model_alpha = self._full_classifier.alpha_
 
-        print('TRAINING RESULTS Full ROCKET:')
-        print('Optimal Alpha Full ROCKET: {:.2f}'.format(self._full_model_alpha))
-        print('Train Accuraccy Full ROCKET: {:.2f}%'.format(100*self._full_classifier.score(self._feature_matrix, y)))
-        print('-------------------------')
+        if self.verbose == True:
+            print('TRAINING RESULTS Full ROCKET:')
+            print('Optimal Alpha Full ROCKET: {:.2f}'.format(self._full_model_alpha))
+            print('Train Accuraccy Full ROCKET: {:.2f}%'.format(100*self._full_classifier.score(self._feature_matrix, y)))
+            print('-------------------------')
 
         # If fixed percentage is not provided, we set the number of features using the validation set
         if self.fixed_percentage is None:
@@ -209,7 +210,7 @@ class DetachRocket:
             self._is_fitted = True
 
             if self.verbose == True:
-                print('Using fixed percentage of features')
+                ('Using fixed percentage of features')
             self.fit_fixed_percentage(self.fixed_percentage)
 
         return
@@ -385,7 +386,7 @@ class DetachMatrix:
             self._feature_matrix_val = val_set
 
         if self.verbose == True:
-            print('Fitting Full Model')
+            ('Fitting Full Model')
 
         # scale feature matrix
         self._feature_matrix = self._scaler.fit_transform(self._feature_matrix)
@@ -395,10 +396,11 @@ class DetachMatrix:
         self._full_classifier.fit(self._feature_matrix, y)
         self._full_model_alpha = self._full_classifier.alpha_
 
-        print('TRAINING RESULTS Full Features:')
-        print('Optimal Alpha Full Features: {:.2f}'.format(self._full_model_alpha))
-        print('Train Accuraccy Full Features: {:.2f}%'.format(100*self._full_classifier.score(self._feature_matrix, y)))
-        print('-------------------------')
+        if self.verbose == True:
+            print('TRAINING RESULTS Full Features:')
+            print('Optimal Alpha Full Features: {:.2f}'.format(self._full_model_alpha))
+            print('Train Accuraccy Full Features: {:.2f}%'.format(100*self._full_classifier.score(self._feature_matrix, y)))
+            print('-------------------------')
 
 
         # If fixed percentage is not provided, we set the number of features using the validation set
