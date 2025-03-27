@@ -913,12 +913,15 @@ class DetachEnsemble():
 
         return np.median(channel_relevance_matrix, axis=0)
     
-    def get_model_sizes(self):
+    def get_max_percentage(self):
         """
-        Returns the size of each model in the ensemble, in terms of number of kernels.
+        Returns the maximum percentage of features that each model in the ensemble has selected.
         """
-        model = self.derockets[0]
-        print(f'model._max_percentage: {model._max_percentage}')
-        print(f'model.num_kernels: {model.num_kernels}')
-        print(f'model._feature_importance_matrix.shape: {model._feature_importance_matrix.shape}')
-        return [model._max_percentage * model.num_kernels for model in self.derockets]
+        return [model._max_percentage for model in self.derockets]
+
+    def get_num_features(self):
+        """
+        Returns the number of features that each model in the ensemble has selected.
+        """
+        return [model._feature_importance_matrix.shape[1] for model in self.derockets]
+
