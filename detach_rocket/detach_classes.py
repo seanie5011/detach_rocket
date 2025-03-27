@@ -831,6 +831,7 @@ class DetachEnsemble():
         self.num_kernels = num_kernels
         self.model_type = model_type
         self.derockets = []
+        self.verbose = verbose
         for _ in range(num_models):
             _DetachRocket = DetachRocket(
                             model_type='pytorch_minirocket',
@@ -838,7 +839,7 @@ class DetachEnsemble():
                             trade_off=trade_off,
                             recompute_alpha=recompute_alpha,
                             val_ratio=val_ratio,
-                            verbose=True if verbose == 2 else False,
+                            verbose=True if self.verbose == 2 else False,
                             multilabel_type=multilabel_type,
                             fixed_percentage=fixed_percentage,
                            )
