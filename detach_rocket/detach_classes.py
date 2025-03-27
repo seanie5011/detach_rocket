@@ -847,7 +847,10 @@ class DetachEnsemble():
 
     # Transformer / Classifier methods
     def fit(self, X, y):
-        [model.fit(X, y) for model in self.derockets]
+        for i, model in enumerate(self.derockets):
+            print(f'Fitting model {i+1:03d} of {self.num_models:03d}')
+            model.fit(X, y)
+            print(f'              {i+1:03d} is {100*model._max_percentage:7.3f}% of the original model size.')
         self.num_channels = X.shape[1]
         self.label_encoder.fit(y)
 
