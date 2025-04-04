@@ -295,89 +295,6 @@ class DetachRocket:
 
         return self._classifier.score(masked_transformed_X, y), self._full_classifier.score(transformed_X, y)
 
-    def get_kernel_features(self, which, where):
-        """
-        Get the channel combinations for selected features.
-        
-        Parameters:
-        - which: Type of features to return ('channels' only for now)
-        - where: Boolean mask indicating which features to retrieve
-        
-        Returns:
-        - Array of channel combinations for selected features
-        """
-        assert which == 'channels', f"Incorrect which {which}: DetachRocket currently only supports 'channels'"
-        
-        # Handle PyTorch implementation 
-        if isinstance(self._full_transformer, PytorchMiniRocketMultivariate):
-            return self._full_transformer.get_kernel_features(which, where)
-        
-        # Handle sktime MiniRocketMultivariate
-        elif hasattr(self._full_transformer, 'parameters'):
-            # Access the parameters from the fitted MiniRocket transformer
-            num_channels_per_combination, channel_indices, dilations, num_features_per_dilation, _ = self._full_transformer.parameters
-            
-            # Get dimensions
-            if hasattr(self._full_transformer, '_X'):
-                n_channels = self._full_transformer._X.shape[1]
-            else:
-                # Try to infer from feature matrix
-                n_series_dims = 1  # Default for univariate
-                if hasattr(self, '_feature_matrix'):
-                    # For multivariate time series
-                    n_series_dims = self._feature_matrix.shape[1] // 2  # Rough estimate
-                n_channels = n_series_dims
-            
-            # Reshape where mask for channel dimension
-            where_expanded = where[:, np.newaxis]
-            where_expanded = np.repeat(where_expanded, n_channels, axis=1)
-            
-            # Initialize output array
-            full_features = np.zeros((where.shape[0], n_channels), dtype=float)
-            
-            # Track current feature index
-            feature_index = 0
-            combination_index = 0
-            channel_start_index = 0
-            
-            # Loop through dilations and kernels (84 fixed kernels in MiniRocket)
-            for dilation_index in range(len(dilations)):
-                padding = ((9 - 1) * dilations[dilation_index]) // 2
-                padding_0 = dilation_index % 2
-                
-                num_features_this_dilation = num_features_per_dilation[dilation_index]
-                
-                for kernel_index in range(84):
-                    # Get channel indices for this combination
-                    n_channels_this_combination = num_channels_per_combination[combination_index]
-                    channel_end_index = channel_start_index + n_channels_this_combination
-                    
-                    channels_this_combination = channel_indices[channel_start_index:channel_end_index]
-                    
-                    # Create binary mask for channels used in this combination
-                    channel_mask = np.zeros(n_channels, dtype=float)
-                    for ch_idx in channels_this_combination:
-                        channel_mask[ch_idx] = 1.0
-                    
-                    # Alternating padding pattern (mimicking the _transform_multi function)
-                    padding_1 = (padding_0 + kernel_index) % 2
-                    
-                    # Each kernel-dilation combination produces num_features_this_dilation features
-                    for _ in range(num_features_this_dilation):
-                        if feature_index < full_features.shape[0]:
-                            full_features[feature_index] = channel_mask
-                            feature_index += 1
-                    
-                    # Update indices for next iteration
-                    combination_index += 1
-                    channel_start_index = channel_end_index
-            
-            # Apply the where mask
-            return np.where(where_expanded, full_features, np.nan)
-        
-        else:
-            raise ValueError("Transformer not fitted or is of unsupported type. Expected MiniRocketMultivariate or PytorchMiniRocketMultivariate.")
-
 
 class DetachMatrix:
     """
@@ -909,7 +826,7 @@ class DetachEnsemble():
                 fixed_percentage=None,
                 ):
         
-        assert model_type == 'pytorch_minirocket' or model_type == 'minirocket', "model_type must be 'pytorch_minirocket' or 'sktime_minirocket'"
+        assert model_type == 'pytorch_minirocket', "model_type must be 'pytorch_minirocket'"
             
         self.num_models = num_models
         self.num_kernels = num_kernels
@@ -980,7 +897,7 @@ class DetachEnsemble():
             feature_weights = model._feature_importance_matrix[model._max_index] # Sparse float array (num_features,)
             selection_mask = feature_weights > 0
 
-            channel_combinations_derocket = model.get_kernel_features('channels', selection_mask) # Indicator matrix (num_features, num_channels)
+            channel_combinations_derocket = model._full_transformer.get_kernel_features('channels', selection_mask) # Indicator matrix (num_features, num_channels)
             num_channels_in_kernel = np.nansum(channel_combinations_derocket, axis=1)
 
             # Divide weights by the number of channels (num_features,)
