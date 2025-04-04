@@ -5,7 +5,7 @@ with open("README.md", "r") as fh:
 
 setuptools.setup(
     name="detach_rocket",
-    version="0.0.2",
+    version="0.0.3",
     author="Gonzalo Uribarri & Federico Barone",
     description="Sequential Feature Detachment for Random Convolutional Kernel models.",
     long_description_content_type="text/markdown",
